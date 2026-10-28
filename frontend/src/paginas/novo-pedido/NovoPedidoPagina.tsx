@@ -53,7 +53,7 @@ export function NovoPedidoPagina() {
     <>
       <CabecalhoPagina
         titulo="Novo pedido de compra"
-        descricao="Informe a obra, o fornecedor e os itens. O total define quem precisa aprovar, e a cadeia aparece ao lado antes do envio."
+        descricao="Informe a obra, o fornecedor e os itens. O total define quem precisa aprovar, e a cadeia de aprovação aparece antes do envio."
       />
       {obras.isPending || fornecedores.isPending ? (
         <Stack>
