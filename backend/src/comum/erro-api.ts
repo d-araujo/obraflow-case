@@ -35,7 +35,7 @@ export function naoEncontrado(recurso: string, id: number): ErroApi {
   return new ErroApi(
     HttpStatus.NOT_FOUND,
     'NAO_ENCONTRADO',
-    `${recurso} ${id} não encontrado(a).`,
+    `${recurso} #${id} não existe.`,
   );
 }
 
@@ -43,6 +43,6 @@ export function referenciaInvalida(recurso: string, id: number): ErroApi {
   return new ErroApi(
     HttpStatus.UNPROCESSABLE_ENTITY,
     'REFERENCIA_INVALIDA',
-    `${recurso} ${id} não existe.`,
+    `${recurso} #${id} não existe.`,
   );
 }
