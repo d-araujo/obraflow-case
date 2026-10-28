@@ -15,6 +15,9 @@ por obra, aprovados por uma cadeia de aprovadores definida por faixas de valor. 
 - Client gerado em `backend/src/generated/prisma/` → importar de `../generated/prisma/client.js`.
 - Tabelas em snake_case no plural (`@@map`), colunas camelCase com `@map` em snake_case.
 - Nunca rodar `prisma migrate` sem perguntar ao Davi.
+- A migration `init` cria à mão o índice parcial `faixas_obra_sem_teto_key` (no máximo uma faixa sem
+  teto por obra), que o schema Prisma não expressa. Em migrations futuras, se o Prisma gerar um
+  `DROP INDEX "faixas_obra_sem_teto_key"`, remova essa linha do SQL antes de aplicar.
 
 ## Regra de alçada (modelo CUMULATIVO)
 - A cadeia é formada pelas faixas da obra em ordem crescente de `limiteMaximo` (null = sem teto, por
