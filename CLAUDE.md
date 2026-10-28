@@ -31,12 +31,5 @@ por obra, aprovados por uma cadeia de aprovadores definida por faixas de valor. 
 - Total do item arredondado para 2 casas; total do pedido = soma dos itens.
 - O backend recalcula tudo e ignora totais vindos do front.
 
-## PROIBIDO implementar sem pedido explícito do Davi
-- A montagem da cadeia de aprovação.
-- A lógica de aprovar/rejeitar.
-- A trava de concorrência.
-
-Nessas partes, apenas revisar e explicar.
-
 ## Ao gerar qualquer código
 Explicar o que foi feito e por quê, em português, em poucas linhas.
