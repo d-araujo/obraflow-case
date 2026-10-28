@@ -1,4 +1,3 @@
-// Tabela do meio da relação N:N (Faixa ↔ Usuario), carregando um dado próprio: a ordem.
 model AprovadorFaixa {
   id        Int @id @default(autoincrement())
   faixaId   Int @map("faixa_id")
@@ -8,8 +7,8 @@ model AprovadorFaixa {
   faixa   Faixa   @relation(fields: [faixaId], references: [id], onDelete: Cascade)
   usuario Usuario @relation(fields: [usuarioId], references: [id])
 
-  @@unique([faixaId, ordem]) // não existem dois "1º aprovador" na mesma faixa
-  @@unique([faixaId, usuarioId]) // a mesma pessoa não aparece duas vezes na faixa
+  @@unique([faixaId, ordem])
+  @@unique([faixaId, usuarioId])
   @@index([usuarioId])
   @@map("aprovadores_faixa")
 }

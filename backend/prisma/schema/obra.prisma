@@ -2,7 +2,7 @@ model Obra {
   id       Int      @id @default(autoincrement())
   nome     String
   criadoEm DateTime @default(now()) @map("criado_em")
-  pedidos  Pedido[] // lado "1" da relação 1:N — isso NÃO vira coluna, é só para o Prisma navegar
+  pedidos  Pedido[]
   faixas   Faixa[]
 
   @@map("obras")

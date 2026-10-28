@@ -2,10 +2,10 @@ model Item {
   id            Int     @id @default(autoincrement())
   pedidoId      Int     @map("pedido_id")
   descricao     String
-  quantidade    Decimal @db.Decimal(12, 3) // aceita 2,5 kg
+  quantidade    Decimal @db.Decimal(12, 3)
   unidade       Unidade
   precoUnitario Decimal @map("preco_unitario") @db.Decimal(14, 2)
-  total         Decimal @db.Decimal(14, 2) // quantidade × preço, arredondado
+  total         Decimal @db.Decimal(14, 2) // quantidade × preço arredondado a 2 casas (half-up)
 
   pedido Pedido @relation(fields: [pedidoId], references: [id])
 

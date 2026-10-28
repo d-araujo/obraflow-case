@@ -6,13 +6,12 @@ enum StatusPedido {
   @@map("status_pedido")
 }
 
-// Não existe "AGUARDANDO": qual etapa pendente é a da vez quem diz é Pedido.etapaAtual.
-// Guardar isso aqui também seria duplicar informação.
+// Sem "AGUARDANDO": a etapa da vez é a de ordem = Pedido.etapaAtual. Guardar aqui duplicaria a informação.
 enum StatusEtapa {
   PENDENTE
   APROVADA
   REJEITADA
-  CANCELADA // etapas que nem chegaram a acontecer porque alguém antes rejeitou
+  CANCELADA // etapa que não chegou a acontecer porque uma anterior rejeitou
 
   @@map("status_etapa")
 }
@@ -21,7 +20,7 @@ enum Unidade {
   UN
   KG
   M
-  M2 // enum não aceita "m²"; o front mostra o rótulo bonito
+  M2 // enum não aceita "m²"; o rótulo fica no front
   M3
   H
 
