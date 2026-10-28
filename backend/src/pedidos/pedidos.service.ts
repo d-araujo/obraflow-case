@@ -13,10 +13,14 @@ import {
   referenciaInvalida,
 } from '../comum/erro-api.js';
 import { Prisma } from '../generated/prisma/client.js';
-import { StatusPedido } from '../generated/prisma/enums.js';
+import { StatusEtapa, StatusPedido } from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CriarPedidoDto } from './dto/criar-pedido.dto.js';
-import { PedidoDetalheResposta } from './pedido.resposta.js';
+import { ListarPedidosQuery } from './dto/listar-pedidos.query.js';
+import {
+  PedidoDetalheResposta,
+  PedidoResumoResposta,
+} from './pedido.resposta.js';
 
 const doResumo = {
   obra: { select: { id: true, nome: true } },
@@ -108,6 +112,33 @@ export class PedidosService {
     );
 
     return this.detalhar(id);
+  }
+
+  async listar(filtro: ListarPedidosQuery): Promise<PedidoResumoResposta[]> {
+    const { status, aprovadorId } = filtro;
+    const pedidos = await this.prisma.pedido.findMany({
+      where: {
+        status,
+        ...(aprovadorId && {
+          etapas: { some: { aprovadorId, status: StatusEtapa.PENDENTE } },
+        }),
+      },
+      include: doResumo,
+      orderBy: { id: 'desc' },
+    });
+
+    // O Prisma não compara a coluna da relação com a do pai (etapa.ordem = pedido.etapaAtual):
+    // o banco reduz aos pedidos em que o aprovador ainda tem etapa pendente e aqui ficam só os da vez dele.
+    const resultado = aprovadorId
+      ? pedidos.filter((pedido) =>
+          pedido.etapas.some(
+            (etapa) =>
+              etapa.ordem === pedido.etapaAtual &&
+              etapa.aprovadorId === aprovadorId,
+          ),
+        )
+      : pedidos;
+    return resultado.map(paraResumo);
   }
 
   async detalhar(id: number): Promise<PedidoDetalheResposta> {

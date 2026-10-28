@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -10,7 +10,11 @@ import {
 import { ErroResposta } from '../comum/erro-resposta.js';
 import { IdPipe } from '../comum/id.pipe.js';
 import { CriarPedidoDto } from './dto/criar-pedido.dto.js';
-import { PedidoDetalheResposta } from './pedido.resposta.js';
+import { ListarPedidosQuery } from './dto/listar-pedidos.query.js';
+import {
+  PedidoDetalheResposta,
+  PedidoResumoResposta,
+} from './pedido.resposta.js';
 import { PedidosService } from './pedidos.service.js';
 
 @ApiTags('Pedidos')
@@ -28,6 +32,13 @@ export class PedidosController {
   })
   criar(@Body() dto: CriarPedidoDto) {
     return this.pedidos.criar(dto);
+  }
+
+  @Get()
+  @ApiOkResponse({ type: [PedidoResumoResposta] })
+  @ApiBadRequestResponse({ type: ErroResposta })
+  listar(@Query() filtro: ListarPedidosQuery) {
+    return this.pedidos.listar(filtro);
   }
 
   @Get(':id')
