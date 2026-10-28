@@ -22,6 +22,7 @@ enum Unidade {
   KG
   M
   M2 // enum não aceita "m²"; o front mostra o rótulo bonito
+  M3
   H
 
   @@map("unidade")
