@@ -1,0 +1,8 @@
+model Fornecedor {
+  id      Int      @id @default(autoincrement())
+  nome    String
+  cnpj    String?  @unique
+  pedidos Pedido[]
+
+  @@map("fornecedores")
+}

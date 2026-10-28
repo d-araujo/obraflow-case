@@ -1,0 +1,13 @@
+model Faixa {
+  id           Int      @id @default(autoincrement())
+  obraId       Int      @map("obra_id")
+  limiteMaximo Decimal? @map("limite_maximo") @db.Decimal(14, 2) // null = "sem teto" (acima de X)
+
+  obra        Obra             @relation(fields: [obraId], references: [id])
+  aprovadores AprovadorFaixa[]
+
+  // Pegadinha: no Postgres, NULL ≠ NULL, então esta constraint deixa passar
+  // duas faixas "sem teto" na mesma obra. Isso precisa ser validado no service.
+  @@unique([obraId, limiteMaximo])
+  @@map("faixas")
+}

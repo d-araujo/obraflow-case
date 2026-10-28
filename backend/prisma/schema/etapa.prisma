@@ -1,0 +1,18 @@
+// O snapshot: copiado da faixa na criação do pedido, nunca mais olha para a regra.
+// Também é o histórico: as etapas em ordem contam a história do pedido.
+model Etapa {
+  id          Int         @id @default(autoincrement())
+  pedidoId    Int         @map("pedido_id")
+  ordem       Int
+  aprovadorId Int         @map("aprovador_id")
+  status      StatusEtapa @default(PENDENTE)
+  motivo      String? // obrigatório na rejeição — validado no service, não no banco
+  decididaEm  DateTime?   @map("decidida_em")
+
+  pedido    Pedido  @relation(fields: [pedidoId], references: [id])
+  aprovador Usuario @relation(fields: [aprovadorId], references: [id])
+
+  @@unique([pedidoId, ordem])
+  @@index([aprovadorId, status]) // acelera "pedidos pendentes para o João"
+  @@map("etapas")
+}

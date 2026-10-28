@@ -1,0 +1,19 @@
+model Pedido {
+  id           Int          @id @default(autoincrement())
+  obraId       Int          @map("obra_id") // FK fica no lado "N" — esta SIM vira coluna
+  fornecedorId Int          @map("fornecedor_id")
+  dataPedido   DateTime     @map("data_pedido") @db.Date
+  observacoes  String? // "?" = opcional = coluna aceita NULL
+  total        Decimal      @db.Decimal(14, 2) // calculado pelo back, persistido
+  status       StatusPedido @default(PENDENTE)
+  etapaAtual   Int?         @map("etapa_atual") // "ordem" da etapa da vez; null quando o fluxo terminou
+  criadoEm     DateTime     @default(now()) @map("criado_em")
+
+  obra       Obra       @relation(fields: [obraId], references: [id])
+  fornecedor Fornecedor @relation(fields: [fornecedorId], references: [id])
+  itens      Item[]
+  etapas     Etapa[]
+
+  @@index([status])
+  @@map("pedidos")
+}

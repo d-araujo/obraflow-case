@@ -1,0 +1,9 @@
+model Usuario {
+  id     Int              @id @default(autoincrement())
+  nome   String
+  email  String           @unique
+  faixas AprovadorFaixa[]
+  etapas Etapa[]
+
+  @@map("usuarios")
+}
