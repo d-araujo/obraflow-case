@@ -41,7 +41,9 @@ describe('Decisão concorrente (e2e)', () => {
       aprovar(pedidoId, aprovador),
     ]);
 
-    expect(respostas.map((r) => r.status).sort()).toEqual([200, 409]);
+    expect(respostas.map((r) => r.status).sort((a, b) => a - b)).toEqual([
+      200, 409,
+    ]);
     const pedido = await prisma.pedido.findUniqueOrThrow({
       where: { id: pedidoId },
       include: { etapas: true },
