@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AlcadaModule } from './alcada/alcada.module.js';
 import { FornecedoresModule } from './fornecedores/fornecedores.module.js';
 import { ObrasModule } from './obras/obras.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -12,6 +13,7 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
     ObrasModule,
     UsuariosModule,
     FornecedoresModule,
+    AlcadaModule,
   ],
 })
 export class AppModule {}
