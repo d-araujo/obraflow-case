@@ -15,6 +15,7 @@ import {
 import { Prisma } from '../generated/prisma/client.js';
 import { StatusEtapa, StatusPedido } from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { Decisao, planejarDecisao } from './decisao.js';
 import { CriarPedidoDto } from './dto/criar-pedido.dto.js';
 import { ListarPedidosQuery } from './dto/listar-pedidos.query.js';
 import {
@@ -148,6 +149,74 @@ export class PedidosService {
     });
     if (!pedido) throw naoEncontrado('Pedido', id);
     return paraDetalhe(pedido);
+  }
+
+  aprovar(id: number, usuarioId: number): Promise<PedidoDetalheResposta> {
+    return this.decidir(id, usuarioId, { tipo: 'aprovar' });
+  }
+
+  rejeitar(
+    id: number,
+    usuarioId: number,
+    motivo: string,
+  ): Promise<PedidoDetalheResposta> {
+    return this.decidir(id, usuarioId, { tipo: 'rejeitar', motivo });
+  }
+
+  // Fica em READ COMMITTED de propósito: é nesse nível que o UPDATE bloqueado reavalia o WHERE e
+  // devolve count 0. Em RepeatableRead o Postgres abortaria com erro de serialização.
+  private async decidir(
+    id: number,
+    usuarioId: number,
+    decisao: Decisao,
+  ): Promise<PedidoDetalheResposta> {
+    await this.prisma.$transaction(async (tx) => {
+      const pedido = await tx.pedido.findUnique({
+        where: { id },
+        include: {
+          etapas: { include: { aprovador: { select: { nome: true } } } },
+        },
+      });
+      if (!pedido) throw naoEncontrado('Pedido', id);
+
+      const plano = planejarDecisao(pedido, usuarioId, decisao);
+
+      // Trava otimista: o UPDATE só casa se o pedido continua na etapa lida acima. Se outra decisão
+      // chegou antes, ela segura o lock da linha; quando commita, o Postgres reavalia este WHERE na
+      // versão nova (etapaAtual já mudou) e nenhuma linha é afetada.
+      const { count } = await tx.pedido.updateMany({
+        where: {
+          id,
+          status: StatusPedido.PENDENTE,
+          etapaAtual: plano.etapa.ordem,
+        },
+        data: plano.pedido,
+      });
+      if (count === 0) {
+        throw new ErroApi(
+          HttpStatus.CONFLICT,
+          'DECISAO_CONCORRENTE',
+          'Outra decisão foi registrada neste pedido ao mesmo tempo. Atualize a tela e tente novamente.',
+        );
+      }
+
+      await tx.etapa.update({
+        where: { id: plano.etapa.id },
+        data: {
+          status: plano.etapa.status,
+          motivo: plano.etapa.motivo,
+          decididaEm: new Date(),
+        },
+      });
+      if (plano.cancelarEtapasApos !== null) {
+        await tx.etapa.updateMany({
+          where: { pedidoId: id, ordem: { gt: plano.cancelarEtapasApos } },
+          data: { status: StatusEtapa.CANCELADA },
+        });
+      }
+    });
+
+    return this.detalhar(id);
   }
 }
 
