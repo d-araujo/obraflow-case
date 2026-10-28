@@ -9,5 +9,6 @@ model Item {
 
   pedido Pedido @relation(fields: [pedidoId], references: [id])
 
+  @@index([pedidoId])
   @@map("itens")
 }

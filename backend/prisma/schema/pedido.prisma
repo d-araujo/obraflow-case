@@ -15,5 +15,7 @@ model Pedido {
   etapas     Etapa[]
 
   @@index([status])
+  @@index([obraId])
+  @@index([fornecedorId])
   @@map("pedidos")
 }

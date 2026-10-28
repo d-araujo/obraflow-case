@@ -10,5 +10,6 @@ model AprovadorFaixa {
 
   @@unique([faixaId, ordem]) // não existem dois "1º aprovador" na mesma faixa
   @@unique([faixaId, usuarioId]) // a mesma pessoa não aparece duas vezes na faixa
+  @@index([usuarioId])
   @@map("aprovadores_faixa")
 }
