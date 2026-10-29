@@ -389,21 +389,19 @@ Usei o Claude Code como assistente de desenvolvimento; as decisões de modelagem
 
 ## O que mudaria em produção
 
-- **Autenticação e autorização reais:** login (OIDC/JWT), identidade vinda do token e não de um header, e papéis
-  (quem pode editar regras, quem pode cadastrar pedidos).
-- **Auditoria por eventos:** registrar cada fato (`PedidoCriado`, `EtapaAprovada`, `RegraAlterada`) numa tabela
-  append-only ou num outbox, com quem, quando e de onde. Hoje o histórico existe nas etapas, mas alterações de
-  regra não ficam registradas.
-- **Notificações:** avisar o próximo aprovador (e-mail, push ou WhatsApp) quando o pedido chega à vez dele,
-  publicadas pelo outbox para não depender da requisição.
-- **Paginação e filtros no servidor** na lista de pedidos (cursor por id, filtro por obra e período). O filtro
-  "aguardando decisão" passaria para SQL (`JOIN etapas ON ordem = etapa_atual`).
-- **Observabilidade:** logs estruturados com id de correlação, métricas (tempo médio por etapa, taxa de 409) e
-  tracing (OpenTelemetry).
-- **Versionamento das regras:** em vez de editar a faixa no lugar, criar uma nova versão da regra e guardar no
-  pedido qual versão gerou a cadeia.
-- **Robustez:** `CHECK` no banco para valores positivos, rate limit, Postgres gerenciado com backup, CI
-  rodando lint, testes e e2e, e code splitting por rota no front (o bundle principal tem ~850 kB).
+1. **Login de verdade com token.** Hoje quem age é escolhido numa lista no topo da tela. Em produção a pessoa
+   entraria com seu usuário, a API saberia quem ela é por um token que não dá para falsificar, e cada um só
+   faria o que pode (por exemplo, só algumas pessoas mudam as regras).
+2. **Registrar também quem alterou as regras e quando.** O histórico de cada pedido já fica gravado; faltam as
+   mudanças nas faixas e nos aprovadores, para saber depois quem mudou o quê.
+3. **Avisar o próximo aprovador.** Mandar e-mail ou mensagem quando o pedido chega à vez de alguém, sem atrasar
+   a resposta da tela e sem perder o aviso se o envio falhar.
+4. **Paginação.** Mostrar os pedidos em páginas, com filtro por obra e período, e carregar cada tela só quando
+   ela for aberta, para o sistema continuar rápido com milhares de pedidos.
+5. **Logs e monitoramento.** Registrar o que acontece na API e acompanhar erros e lentidão, para descobrir um
+   problema antes de o usuário reclamar.
+6. **Rodar testes automaticamente a cada push.** Lint, testes e build rodando sozinhos no GitHub a cada envio de
+   código, para nada quebrado chegar à versão publicada.
 
 ---
 
