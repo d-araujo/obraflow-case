@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import type { StatusEtapa, StatusPedido, Unidade } from '../api/tipos';
 
 export const UNIDADES: { value: Unidade; label: string }[] = [
@@ -39,6 +40,11 @@ const dataHora = new Intl.DateTimeFormat('pt-BR', {
 // do navegador a empurre para o dia anterior.
 export function formatarData(dia: string): string {
   return data.format(new Date(`${dia}T00:00:00Z`));
+}
+
+// Dia do calendário de quem usa a tela. Não usar toISOString(): à noite no Brasil, em UTC já é amanhã.
+export function hoje(): string {
+  return dayjs().format('YYYY-MM-DD');
 }
 
 export function formatarDataHora(iso: string): string {

@@ -22,7 +22,6 @@ import {
   IconBuildingSkyscraper,
   IconCalendar,
 } from '@tabler/icons-react';
-import dayjs from 'dayjs';
 import { Link, useNavigate } from 'react-router';
 import { ErroApi } from '../../api/cliente';
 import {
@@ -35,6 +34,7 @@ import { CabecalhoPagina } from '../../componentes/CabecalhoPagina';
 import { CadeiaPrevista } from '../../componentes/CadeiaPrevista';
 import { EstadoErro } from '../../componentes/EstadoErro';
 import { formatarReais } from '../../comum/dinheiro';
+import { hoje } from '../../comum/rotulos';
 import {
   paraNovoPedido,
   resumirPendencias,
@@ -104,7 +104,7 @@ function FormularioPedido({ obras, fornecedores }: FormularioProps) {
   const criar = useCriarPedido();
   const form = useForm<ValoresPedido>({
     mode: 'controlled',
-    initialValues: valoresIniciais(dayjs().format('YYYY-MM-DD')),
+    initialValues: valoresIniciais(hoje()),
     validate: validarPedido,
     validateInputOnBlur: true,
   });
