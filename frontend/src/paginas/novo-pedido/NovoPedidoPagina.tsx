@@ -266,9 +266,12 @@ function FormularioPedido({ obras, fornecedores }: FormularioProps) {
                   Para cadastrar: {juntar(pendencias)}.
                 </Text>
               )}
-              {pendencias.length === 0 && semFaixa && (
+              {pendencias.length === 0 && semFaixa && obraId !== null && (
                 <Text size="xs" c="dimmed" mt="xs">
-                  Nenhuma faixa de alçada cobre este total.
+                  Nenhuma faixa de alçada cobre este total.{' '}
+                  <Anchor component={Link} to={linkDasRegras(obraId)} size="xs">
+                    Ajustar regras da obra
+                  </Anchor>
                 </Text>
               )}
             </Grid.Col>
