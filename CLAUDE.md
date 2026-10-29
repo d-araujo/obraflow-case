@@ -5,7 +5,7 @@ por obra, aprovados por uma cadeia de aprovadores definida por faixas de valor. 
 
 ## Stack
 - `backend/`: NestJS 12 + Prisma 7 (driver adapter `@prisma/adapter-pg`) + PostgreSQL (Docker).
-- `frontend/`: React + Vite + TypeScript (ainda não criado).
+- `frontend/`: React 19 + Vite 8 + TypeScript + Mantine 9 + TanStack Query + React Router 8.
 - `docker-compose.yml` na raiz: só o Postgres.
 
 ## Prisma
