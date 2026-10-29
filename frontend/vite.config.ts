@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   test: {
     include: ['src/**/*.test.ts'],
+    env: { TZ: 'America/Bahia' },
   },
 });

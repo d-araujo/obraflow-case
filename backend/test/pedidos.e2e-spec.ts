@@ -51,6 +51,23 @@ describe('Pedidos (e2e)', () => {
     expect(resposta.body.etapaAtual).toBe(1);
   });
 
+  it('a data do pedido volta igual, qualquer que seja o fuso do servidor', async () => {
+    const cenario = await criarCenario(app, 1);
+    const http = app.getHttpServer();
+
+    const criado = await request(http)
+      .post('/pedidos')
+      .send({ ...corpoDoPedido(cenario), dataPedido: '2026-10-29' })
+      .expect(201);
+    const lista = await request(http).get('/pedidos').expect(200);
+    const [noBanco] = await prisma.$queryRaw<{ dia: string }[]>`
+      SELECT data_pedido::text AS dia FROM pedidos WHERE id = ${criado.body.id}`;
+
+    expect(criado.body.dataPedido).toBe('2026-10-29');
+    expect(lista.body[0].dataPedido).toBe('2026-10-29');
+    expect(noBanco.dia).toBe('2026-10-29');
+  });
+
   it('sem faixa aplicável: responde 422 e não grava nada', async () => {
     const cenario = await criarCenario(app, 1);
     await prisma.faixa.deleteMany();
