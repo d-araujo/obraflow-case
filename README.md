@@ -75,14 +75,16 @@ pendente na 1ª, 2ª e 3ª etapa, aprovados, e rejeitados na 1ª e na 3ª etapa 
 ```bash
 cd backend
 npm test           # unitários: cadeia, decisão, dinheiro (27 testes)
-npm run test:e2e   # e2e com Postgres real em um banco separado, obraflow_test (5 testes)
+npm run test:e2e   # e2e com Postgres real em um banco separado, obraflow_test (12 testes)
 
 cd frontend
-npm test           # unitários: cálculos, validação dos formulários, regras de exibição (27 testes)
+npm test           # unitários: cálculos, validação dos formulários, regras de exibição (34 testes)
 ```
 
-Os testes e2e criam e migram o banco `obraflow_test` sozinhos e nunca tocam nos dados do seed. Entre eles está o
-de concorrência: aprovações simultâneas da mesma etapa, em que só uma pode vencer.
+Os testes e2e criam e migram o banco `obraflow_test` sozinhos e nunca tocam nos dados do seed. Entre eles estão o
+de concorrência (aprovações simultâneas da mesma etapa, em que só uma pode vencer), a recusa pela API de decisão
+fora da vez e de rejeição sem motivo, a recusa da segunda faixa sem teto (inclusive direto no banco) e a data do
+pedido voltando igual qualquer que seja o fuso do servidor. Os testes do front rodam no fuso `America/Bahia`.
 
 ---
 
@@ -110,7 +112,7 @@ de concorrência: aprovações simultâneas da mesma etapa, em que só uma pode 
 | Front | **React + Vite + TypeScript** | Ecossistema padrão, build rápido e tipos compartilhando o contrato da API. |
 | UI | **Mantine 9** | Componentes acessíveis prontos (tabela, drawer, modal, timeline, empty state) e formulários com validação por campo, inclusive em listas (`itens.0.quantidade`). |
 | Estado do servidor | **TanStack Query** | Cache, loading/erro por consulta, retry e invalidação depois de mutações; nada de estado global feito à mão. |
-| Rotas | **React Router 8** | Filtros e o pedido aberto ficam na URL (`/aprovacoes?status=PENDENTE&pedido=3`), então dá para compartilhar e voltar. |
+| Rotas | **React Router 8** | Filtros, o pedido aberto e a obra das regras ficam na URL (`/aprovacoes?status=PENDENTE&pedido=3`, `/regras?obra=1`), então dá para compartilhar, recarregar e voltar. |
 | Testes | **Vitest** + **Supertest** | Mesmo runner nos dois projetos; os e2e usam Postgres real porque concorrência não se testa com mock. |
 | Lint/format | **oxlint** + **Prettier** | oxlint com regras type-aware (por exemplo, promises sem `await`). |
 
@@ -252,7 +254,8 @@ simultâneas da mesma etapa e confere que exatamente uma vence e que a etapa seg
 
 **Ordem da alçada.** Só o aprovador da etapa atual decide (403 `FORA_DA_VEZ` caso contrário); pedido concluído
 responde 409 `FLUXO_CONCLUIDO`; rejeição sem motivo responde 400. Essas regras ficam numa função pura
-([backend/src/pedidos/decisao.ts](backend/src/pedidos/decisao.ts)) com testes unitários.
+([backend/src/pedidos/decisao.ts](backend/src/pedidos/decisao.ts)) com testes unitários, e os testes e2e confirmam
+o mesmo comportamento pela API.
 
 **Constraints no banco**, a última barreira quando duas requisições passam juntas pelas validações do service:
 - `UNIQUE (faixa_id, ordem)` e `UNIQUE (faixa_id, usuario_id)` nos aprovadores; `UNIQUE (pedido_id, ordem)` nas etapas.
