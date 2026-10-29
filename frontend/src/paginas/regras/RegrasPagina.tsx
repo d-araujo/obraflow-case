@@ -26,7 +26,7 @@ import {
   IconPlus,
   IconTrash,
 } from '@tabler/icons-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   useFaixas,
@@ -43,15 +43,29 @@ import { paraDecimal, type ValorDigitado } from '../../comum/dinheiro';
 import { rotuloDaFaixa } from '../../comum/faixas';
 import { ModalFaixa } from './ModalFaixa';
 import { ModalNovaObra } from './ModalNovaObra';
+import { PARAMETRO_OBRA, resolverObra } from './obra-da-url';
 
 export function RegrasPagina() {
   const obras = useObras();
   const [parametros, definirParametros] = useSearchParams();
   const [criandoObra, definirCriandoObra] = useState(false);
 
-  const obraId = Number(parametros.get('obra')) || obras.data?.[0]?.id || null;
+  const parametroObra = parametros.get(PARAMETRO_OBRA);
+  const obraId = obras.data ? resolverObra(parametroObra, obras.data) : null;
   const selecionarObra = (id: number | null) =>
-    definirParametros(id ? { obra: String(id) } : {}, { replace: true });
+    definirParametros(id ? { [PARAMETRO_OBRA]: String(id) } : {}, {
+      replace: true,
+    });
+
+  // A URL sempre diz qual obra está na tela, inclusive quando ela veio do padrão (primeira obra).
+  useEffect(() => {
+    if (obraId !== null && parametroObra !== String(obraId)) {
+      definirParametros(
+        { [PARAMETRO_OBRA]: String(obraId) },
+        { replace: true },
+      );
+    }
+  }, [obraId, parametroObra, definirParametros]);
 
   return (
     <>

@@ -44,6 +44,7 @@ import {
   type ValoresPedido,
 } from './formulario';
 import { ItensDoPedido } from './ItensDoPedido';
+import { linkDasRegras } from '../regras/obra-da-url';
 
 export function NovoPedidoPagina() {
   const obras = useObras();
@@ -156,12 +157,12 @@ function FormularioPedido({ obras, fornecedores }: FormularioProps) {
               data={obras.map((o) => ({ value: o.id, label: o.nome }))}
               nothingFoundMessage="Nenhuma obra encontrada"
               description={
-                obraSemRegras ? (
+                obraSemRegras && obraId !== null ? (
                   <>
                     Obra sem regras de alçada.{' '}
                     <Anchor
                       component={Link}
-                      to={`/regras?obra=${obraId}`}
+                      to={linkDasRegras(obraId)}
                       size="xs"
                     >
                       Configurar regras
